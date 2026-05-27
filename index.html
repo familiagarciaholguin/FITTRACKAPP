@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FitTrack">
+<title>FitTrack Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --ink:#0c0c0d;--surface:#f8f7f4;--surface2:#f2f1ed;--line:#e0ddd5;
+  --gold:#c9a84c;--gold2:#e8c76a;--gold-pale:#fdf8ec;
+  --text:#0c0c0d;--text2:#4a4844;--text3:#8a877f;
+  --green:#1a6b4a;--green-pale:#eaf5f0;
+  --red:#8b2020;--red-pale:#fdf0f0;
+  --amber:#7a5a00;--amber-pale:#fdf8e8;
+  --syne:'Syne',sans-serif;--mono:'Geist Mono',monospace;
+  --radius:12px;--radius-lg:18px;
+  --shadow:0 2px 12px rgba(0,0,0,0.07);
+  --nav-h:72px;
+}
+html,body{background:var(--surface);color:var(--text);font-family:var(--syne);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.content-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 12px)}
+.content-area::-webkit-scrollbar{display:none}
+
+/* TOP BAR */
+.topbar{background:var(--ink);padding:52px 20px 16px;flex-shrink:0;position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.2) 0%,transparent 70%)}
+.topbar-brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.topbar-icon{width:32px;height:32px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topbar-icon i{font-size:16px;color:var(--ink)}
+.topbar-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.4px}
+.topbar-sub{font-size:10px;color:rgba(255,255,255,0.4);font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase}
+.topbar-page{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.6px;margin-top:8px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1px solid var(--line);display:flex;align-items:stretch;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all 0.15s;color:var(--text3);border:none;background:none;font-family:var(--syne);padding-bottom:4px}
+.nav-tab i{font-size:22px;transition:all 0.15s}
+.nav-tab span{font-size:10px;font-weight:600;letter-spacing:0.3px;transition:all 0.15s}
+.nav-tab.active{color:var(--ink)}
+.nav-tab.active i{color:var(--gold)}
+.nav-tab-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:none;background:none;font-family:var(--syne)}
+.nav-center-btn{width:52px;height:52px;background:var(--ink);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.nav-tab-center:active .nav-center-btn{transform:scale(0.92)}
+.nav-center-btn i{font-size:24px;color:#fff}
+.nav-tab-center span{font-size:10px;font-weight:600;color:var(--text3)}
+
+/* SCREENS */
+.screen{display:none;padding:16px}
+.screen.active{display:block}
+
+/* DASHBOARD */
+.hero-strip{background:var(--ink);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero-strip::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.2) 0%,transparent 70%)}
+.hero-eyebrow{font-size:9px;font-family:var(--mono);letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.hero-title{font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.4px;margin-bottom:4px;line-height:1.2}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;margin-bottom:14px}
+.btn-gold{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:var(--syne);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;position:relative;z-index:1}
+.btn-gold:active{transform:scale(0.96)}
+
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.kpi-label{font-size:9px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1}
+.kpi-delta{font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:4px}
+.kpi-delta.up{color:var(--green)}
+
+.section-title{font-size:11px;font-family:var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+.quick-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.quick-card:active{transform:scale(0.98);background:var(--surface2)}
+.quick-card-icon{width:36px;height:36px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quick-card-icon i{font-size:18px;color:var(--text2)}
+.quick-card-title{font-size:14px;font-weight:700;color:var(--text)}
+.quick-card-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.quick-card-arrow{margin-left:auto;font-size:18px;color:var(--line)}
+
+.recent-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.recent-item:last-child{border-bottom:none}
+.recent-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.recent-name{font-size:13px;font-weight:600;flex:1}
+.recent-meta{font-size:11px;font-family:var(--mono);color:var(--text3)}
+
+/* ENCYCLOPEDIA */
+.enc-search-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;box-shadow:var(--shadow)}
+.enc-search-wrap i{font-size:18px;color:var(--text3)}
+.enc-search-wrap input{flex:1;border:none;outline:none;font-family:var(--syne);font-size:14px;color:var(--text);background:transparent}
+.enc-search-wrap input::placeholder{color:var(--text3)}
+
+.muscle-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.muscle-scroll::-webkit-scrollbar{display:none}
+.muscle-pill{padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;font-family:var(--syne);flex-shrink:0}
+.muscle-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.muscle-pill:active{transform:scale(0.95)}
+
+.subgroup-block{margin-bottom:14px}
+.subgroup-label{font-size:9px;font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;padding-left:2px}
+.ex-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1px solid var(--line);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;margin:3px;font-weight:500;box-shadow:var(--shadow);transition:all 0.15s}
+.ex-chip:active{transform:scale(0.95);background:#fff0f0;border-color:#FF0000}
+.ex-chip i{font-size:12px;color:#FF0000;opacity:0.8}
+
+/* LOG FORM */
+.form-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.form-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px;display:block;letter-spacing:0.2px}
+.form-input{width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-family:var(--syne);font-size:14px;color:var(--text);outline:none;transition:all 0.14s;-webkit-appearance:none;appearance:none}
+.form-input:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,168,76,0.1)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%238a877f' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-group{margin-bottom:10px}
+
+.sets-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px}
+.sets-head{display:grid;grid-template-columns:32px 1fr 1fr 1fr 32px;background:var(--surface2);padding:10px 14px;border-bottom:1px solid var(--line)}
+.sets-head-cell{font-size:9px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--text3)}
+.set-row{display:grid;grid-template-columns:32px 1fr 1fr 1fr 32px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:center}
+.set-row:last-child{border-bottom:none}
+.set-badge{width:22px;height:22px;border-radius:6px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono)}
+.set-input{width:100%;padding:7px 6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-family:var(--syne);font-size:13px;color:var(--text);outline:none;text-align:center;-webkit-appearance:none}
+.set-input:focus{border-color:var(--gold);background:#fff}
+.btn-del-sm{width:26px;height:26px;border-radius:7px;background:transparent;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3)}
+.btn-del-sm:active{background:var(--red-pale);border-color:var(--red);color:var(--red)}
+.btn-del-sm i{font-size:13px}
+.sets-add-btn{padding:13px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text3);font-size:13px;font-weight:600;border-top:1px solid var(--line);background:transparent;width:100%;font-family:var(--syne)}
+.sets-add-btn:active{background:var(--gold-pale);color:var(--amber)}
+.sets-add-btn i{font-size:16px}
+
+.btn-save{width:100%;padding:15px;background:var(--ink);color:#fff;border:none;border-radius:var(--radius);font-family:var(--syne);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;letter-spacing:-0.3px}
+.btn-save:active{transform:scale(0.97)}
+.btn-save i{font-size:18px}
+.btn-secondary{width:100%;padding:13px;background:transparent;color:var(--text2);border:1px solid var(--line);border-radius:var(--radius);font-family:var(--syne);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-secondary:active{background:var(--surface2)}
+
+/* HISTORY */
+.hist-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.hist-filters::-webkit-scrollbar{display:none}
+.hist-pill{padding:7px 14px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--syne);flex-shrink:0}
+.hist-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.log-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px}
+.log-card-top{padding:14px 16px;border-bottom:1px solid var(--line)}
+.log-ex-name{font-size:16px;font-weight:800;letter-spacing:-0.4px;margin-bottom:5px}
+.log-pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-family:var(--mono);border:1px solid}
+.pill-muscle{background:rgba(12,12,13,0.05);color:var(--text2);border-color:var(--line)}
+.pill-vol{background:var(--surface2);color:var(--text3);border-color:var(--line)}
+.pill-up{background:var(--green-pale);color:var(--green);border-color:rgba(26,107,74,0.2)}
+.log-date-row{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.log-date{font-size:11px;font-family:var(--mono);color:var(--text3)}
+
+.log-sets-table{width:100%;border-collapse:collapse}
+.log-sets-table th{font-size:9px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:9px 16px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--line)}
+.log-sets-table td{padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--text2)}
+.log-sets-table tr:last-child td{border-bottom:none}
+.rpe-dots{display:inline-flex;gap:2px}
+.rpe-dot{width:5px;height:5px;border-radius:50%;background:var(--line)}
+.rpe-dot.on{background:var(--gold)}
+
+.log-notes{padding:10px 16px;font-size:12px;color:var(--text3);border-top:1px solid var(--line);display:flex;align-items:center;gap:6px}
+.prog-strip{margin:0 12px 12px;padding:12px;border-radius:10px;border:1px solid;display:flex;align-items:flex-start;gap:10px}
+.prog-strip.up{background:var(--green-pale);border-color:rgba(26,107,74,0.15)}
+.prog-strip.warn{background:var(--amber-pale);border-color:rgba(122,90,0,0.15)}
+.prog-strip.same{background:var(--surface2);border-color:var(--line)}
+.prog-strip i{font-size:18px;flex-shrink:0;margin-top:1px}
+.prog-strip.up i{color:var(--green)}
+.prog-strip.warn i{color:var(--amber)}
+.prog-strip.same i{color:var(--text3)}
+.prog-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.prog-strip.up .prog-title{color:var(--green)}
+.prog-strip.warn .prog-title{color:var(--amber)}
+.prog-body{font-size:11px;color:var(--text3);line-height:1.5}
+
+/* ANALYSIS */
+.analysis-item{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.analysis-ex{font-size:15px;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px}
+.analysis-meta{font-size:12px;color:var(--text3);margin-bottom:10px;font-family:var(--mono)}
+.analysis-bar-wrap{background:var(--surface2);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px}
+.analysis-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:6px;transition:width 0.6s ease}
+.analysis-rec{font-size:12px;color:var(--text2);padding:10px 12px;background:var(--gold-pale);border-radius:8px;border:1px solid rgba(201,168,76,0.2)}
+.analysis-rec strong{color:var(--amber)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(12,12,13,0.6);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.34,1.1,0.64,1)}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--line);border-radius:4px;margin:12px auto 0}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between}
+.modal-ex-name{font-size:18px;font-weight:800;letter-spacing:-0.4px}
+.modal-tag{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:20px;background:var(--gold-pale);color:var(--amber);border:1px solid rgba(201,168,76,0.25);margin-top:4px;display:inline-block}
+.modal-close-btn{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-close-btn i{font-size:16px;color:var(--text2)}
+.modal-body{padding:16px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:14px}
+
+.yt-thumb{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--ink);aspect-ratio:16/9;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.yt-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.yt-play-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3)}
+.yt-play{width:56px;height:40px;background:#FF0000;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.yt-play i{font-size:20px;color:#fff;margin-left:3px}
+.yt-lbl{position:absolute;bottom:8px;left:10px;font-size:10px;font-family:var(--mono);color:rgba(255,255,255,0.8);background:rgba(0,0,0,0.5);padding:2px 7px;border-radius:4px}
+
+.info-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.info-block-label{font-size:9px;font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.badges{display:flex;flex-wrap:wrap;gap:5px}
+.badge-primary{padding:4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);background:rgba(201,168,76,0.12);color:var(--amber);border:1px solid rgba(201,168,76,0.3)}
+.badge-secondary{padding:4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);background:var(--surface2);color:var(--text3);border:1px solid var(--line)}
+.step-item{display:flex;gap:8px;font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.step-item:last-child{margin-bottom:0}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-top:2px}
+.tips-text{font-size:13px;color:var(--text2);line-height:1.6}
+
+.modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;flex-shrink:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.btn-yt{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px;background:#FF0000;color:#fff;border:none;border-radius:var(--radius);font-family:var(--syne);font-size:13px;font-weight:700;cursor:pointer}
+.btn-yt:active{background:#cc0000}
+.btn-use{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:var(--radius);font-family:var(--syne);font-size:13px;font-weight:700;cursor:pointer}
+.btn-use:active{background:#333}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-icon{width:56px;height:56px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.empty-icon i{font-size:24px;color:var(--text3)}
+.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
+.empty-desc{font-size:13px;line-height:1.6;max-width:220px;margin:0 auto}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h) + 12px);left:16px;right:16px;background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,0.2);transform:translateY(20px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:9999;display:flex;align-items:center;gap:10px;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:18px;color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon"><i class="ti ti-bolt"></i></div>
+      <span class="topbar-name">FitTrack</span>
+      <span style="font-size:9px;color:rgba(255,255,255,0.3);font-family:var(--mono);margin-left:2px;align-self:flex-end;margin-bottom:2px">PRO</span>
+    </div>
+    <div class="topbar-page" id="page-title">Dashboard</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- DASHBOARD -->
+    <div class="screen active" id="screen-dashboard">
+      <div style="padding:16px">
+        <div class="hero-strip">
+          <div class="hero-eyebrow">Sistema activo</div>
+          <div class="hero-title">Tu entrenamiento, bajo control</div>
+          <div class="hero-sub">+200 ejercicios con vídeo YouTube · Sobrecarga progresiva automática</div>
+          <button class="btn-gold" onclick="goTo('log')"><i class="ti ti-plus"></i>Nueva sesión</button>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi"><div class="kpi-label">Sesiones</div><div class="kpi-val" id="kpi-s">0</div><div class="kpi-delta" id="kpi-sd">Sin datos</div></div>
+          <div class="kpi"><div class="kpi-label">Ejercicios</div><div class="kpi-val" id="kpi-e">0</div><div class="kpi-delta" id="kpi-ed">Sin datos</div></div>
+          <div class="kpi"><div class="kpi-label">Volumen kg</div><div class="kpi-val" id="kpi-v">0</div><div class="kpi-delta" id="kpi-vd">Sin datos</div></div>
+          <div class="kpi"><div class="kpi-label">PRs</div><div class="kpi-val" id="kpi-p">0</div><div class="kpi-delta" id="kpi-pd">Sin datos</div></div>
+        </div>
+        <div class="section-title">Acceso rápido</div>
+        <div class="quick-card" onclick="goTo('encyclopedia')">
+          <div class="quick-card-icon"><i class="ti ti-books"></i></div>
+          <div><div class="quick-card-title">Enciclopedia</div><div class="quick-card-sub">+200 ejercicios con vídeo YouTube</div></div>
+          <i class="ti ti-chevron-right quick-card-arrow"></i>
+        </div>
+        <div class="quick-card" onclick="goTo('history')">
+          <div class="quick-card-icon"><i class="ti ti-chart-line"></i></div>
+          <div><div class="quick-card-title">Historial</div><div class="quick-card-sub">Progresión y análisis de volumen</div></div>
+          <i class="ti ti-chevron-right quick-card-arrow"></i>
+        </div>
+        <div class="quick-card" onclick="goTo('analysis')">
+          <div class="quick-card-icon"><i class="ti ti-brain"></i></div>
+          <div><div class="quick-card-title">Análisis IA</div><div class="quick-card-sub">Recomendaciones de sobrecarga</div></div>
+          <i class="ti ti-chevron-right quick-card-arrow"></i>
+        </div>
+        <div style="margin-top:16px" class="section-title">Últimas sesiones</div>
+        <div id="recent-list" style="background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);padding:4px 16px;box-shadow:var(--shadow)"></div>
+      </div>
+    </div>
+
+    <!-- ENCYCLOPEDIA -->
+    <div class="screen" id="screen-encyclopedia">
+      <div style="padding:16px">
+        <div class="enc-search-wrap"><i class="ti ti-search"></i><input id="enc-input" placeholder="Buscar ejercicio..." oninput="renderEnc()"></div>
+        <div class="muscle-scroll" id="muscle-scroll"></div>
+        <div id="enc-body"></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="screen" id="screen-log">
+      <div style="padding:16px">
+        <div class="form-card">
+          <div class="section-title" style="margin-bottom:14px">Sesión</div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Fecha</label><input class="form-input" type="date" id="log-date"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Unidad</label><select class="form-input" id="log-unit"><option>kg</option><option>lbs</option></select></div>
+          </div>
+          <div class="form-group" style="margin-top:10px"><label class="form-label">Ejercicio</label><input class="form-input" type="text" id="log-exercise" placeholder="Nombre del ejercicio"></div>
+          <div class="form-group"><label class="form-label">Grupo muscular</label>
+            <select class="form-input" id="log-muscle">
+              <option value="">Seleccionar...</option>
+              <option>Pecho</option><option>Espalda</option><option>Piernas</option>
+              <option>Hombros</option><option>Bíceps</option><option>Tríceps</option>
+              <option>Core</option><option>Antebrazos</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Notas</label><input class="form-input" type="text" id="log-notes" placeholder="Sensaciones, molestias..."></div>
+        </div>
+        <div class="sets-card">
+          <div class="sets-head"><div class="sets-head-cell">#</div><div class="sets-head-cell">Reps</div><div class="sets-head-cell">Peso</div><div class="sets-head-cell">RPE</div><div class="sets-head-cell"></div></div>
+          <div id="sets-body"></div>
+          <button class="sets-add-btn" onclick="addSet()"><i class="ti ti-plus"></i>Añadir serie</button>
+        </div>
+        <button class="btn-save" onclick="saveLog()"><i class="ti ti-device-floppy"></i>Guardar sesión</button>
+        <button class="btn-secondary" onclick="clearForm()">Limpiar formulario</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="screen" id="screen-history">
+      <div style="padding:16px">
+        <div class="hist-filters" id="hist-filters"></div>
+        <div id="hist-body"></div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="screen" id="screen-analysis">
+      <div style="padding:16px">
+        <div id="analysis-body"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-tab active" id="nav-dashboard" onclick="goTo('dashboard')">
+      <i class="ti ti-layout-dashboard"></i><span>Inicio</span>
+    </button>
+    <button class="nav-tab" id="nav-encyclopedia" onclick="goTo('encyclopedia')">
+      <i class="ti ti-books"></i><span>Ejercicios</span>
+    </button>
+    <button class="nav-tab-center" onclick="goTo('log')">
+      <div class="nav-center-btn"><i class="ti ti-plus"></i></div>
+      <span style="font-size:10px;font-weight:600;color:var(--text3)">Registrar</span>
+    </button>
+    <button class="nav-tab" id="nav-history" onclick="goTo('history')">
+      <i class="ti ti-chart-line"></i><span>Historial</span>
+    </button>
+    <button class="nav-tab" id="nav-analysis" onclick="goTo('analysis')">
+      <i class="ti ti-brain"></i><span>Análisis</span>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL BOTTOM SHEET -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalBg(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div><div class="modal-ex-name" id="modal-name">—</div><div class="modal-tag" id="modal-tag">—</div></div>
+      <button class="modal-close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="yt-thumb" id="yt-thumb" onclick="openYT()">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--ink)"><i class="ti ti-brand-youtube" style="font-size:40px;color:rgba(255,255,255,0.12)"></i></div>
+        <div class="yt-play-layer"><div class="yt-play"><i class="ti ti-player-play-filled"></i></div></div>
+        <div class="yt-lbl" id="yt-lbl">Ver en YouTube</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Músculos primarios</div>
+        <div class="badges" id="modal-primary"></div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Músculos secundarios</div>
+        <div class="badges" id="modal-secondary"></div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Ejecución paso a paso</div>
+        <div id="modal-steps"></div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Tips de técnica</div>
+        <div class="tips-text" id="modal-tips"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-yt" onclick="openYT()"><i class="ti ti-brand-youtube"></i>YouTube</button>
+      <button class="btn-use" onclick="useExercise()"><i class="ti ti-pencil-plus"></i>Usar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check" id="toast-icon"></i><span id="toast-msg"></span></div>
+
+<script>
+const DB={
+"Pecho":{"Superior — Inclinados":[{n:"Press inclinado con barra",yt:"https://www.youtube.com/watch?v=jPLdzuHckI8"},{n:"Press inclinado con mancuernas",yt:"https://www.youtube.com/watch?v=8iPEnn-ltC8"},{n:"Press inclinado en máquina",yt:"https://www.youtube.com/watch?v=kGGpGO7gkWo"},{n:"Aperturas inclinadas",yt:"https://www.youtube.com/watch?v=QENKPHhQVi4"},{n:"Crossover polea alta",yt:"https://www.youtube.com/watch?v=taI4XduLpTk"},{n:"Pullover inclinado mancuerna",yt:"https://www.youtube.com/watch?v=FK4rHfWRPsw"},{n:"Press inclinado Smith",yt:"https://www.youtube.com/watch?v=MKxCNJGBFCA"}],"Medio — Planos":[{n:"Press banca con barra",yt:"https://www.youtube.com/watch?v=rT7DgCr-3pg"},{n:"Press banca con mancuernas",yt:"https://www.youtube.com/watch?v=VmB1G1K7v94"},{n:"Pec-deck Mariposa",yt:"https://www.youtube.com/watch?v=Z57CtFmRMxA"},{n:"Aperturas planas mancuernas",yt:"https://www.youtube.com/watch?v=eozdVDA78K0"},{n:"Crossover polea media",yt:"https://www.youtube.com/watch?v=taI4XduLpTk"},{n:"Press banca agarre cerrado",yt:"https://www.youtube.com/watch?v=nEF0bv2Fi54"},{n:"Flexiones",yt:"https://www.youtube.com/watch?v=IODxDxX7oi4"},{n:"Press banca Smith",yt:"https://www.youtube.com/watch?v=N_iAHSjDDGk"}],"Inferior — Declinados":[{n:"Press declinado con barra",yt:"https://www.youtube.com/watch?v=LfyQBUKR8SE"},{n:"Press declinado mancuernas",yt:"https://www.youtube.com/watch?v=4M0c-ZgSaNU"},{n:"Fondos en paralelas pecho",yt:"https://www.youtube.com/watch?v=2z8JmcrW-As"},{n:"Crossover polea baja",yt:"https://www.youtube.com/watch?v=taI4XduLpTk"},{n:"Aperturas declinadas",yt:"https://www.youtube.com/watch?v=Q6YbMJPBYWM"},{n:"Dips en banco",yt:"https://www.youtube.com/watch?v=0326dy_-CzM"}]},
+"Espalda":{"Amplitud — Dominadas":[{n:"Dominadas agarre prono",yt:"https://www.youtube.com/watch?v=eGo4IYlbE5g"},{n:"Dominadas agarre supino",yt:"https://www.youtube.com/watch?v=9JC1EKwOKgU"},{n:"Dominadas agarre neutro",yt:"https://www.youtube.com/watch?v=obB2n1KqS4A"},{n:"Jalón al pecho barra",yt:"https://www.youtube.com/watch?v=CAwf7n6Luuc"},{n:"Jalón agarre neutro",yt:"https://www.youtube.com/watch?v=fbJkMFiHCdw"},{n:"Jalón agarre cerrado",yt:"https://www.youtube.com/watch?v=vYoBSBzmFp0"},{n:"Pullover en polea",yt:"https://www.youtube.com/watch?v=KC59bMJm6QQ"},{n:"Dominadas asistidas",yt:"https://www.youtube.com/watch?v=oFkGxBlwUZU"},{n:"Remo australiano",yt:"https://www.youtube.com/watch?v=aKlzBJR1_YI"}],"Grosor — Remos":[{n:"Remo con barra",yt:"https://www.youtube.com/watch?v=G8l_8chR5BE"},{n:"Remo mancuerna unilateral",yt:"https://www.youtube.com/watch?v=pYcpY20QaE8"},{n:"Remo en polea baja",yt:"https://www.youtube.com/watch?v=GZbfZ033f74"},{n:"Remo en máquina",yt:"https://www.youtube.com/watch?v=xQNrFHEMhI4"},{n:"Remo Pendlay",yt:"https://www.youtube.com/watch?v=3NU5Kk2VBRs"},{n:"Remo T-bar",yt:"https://www.youtube.com/watch?v=j3Igk5nyZE4"},{n:"Remo cable neutro",yt:"https://www.youtube.com/watch?v=GZbfZ033f74"}],"Lumbar":[{n:"Peso muerto convencional",yt:"https://www.youtube.com/watch?v=op9kVnSso6Q"},{n:"Peso muerto rumano",yt:"https://www.youtube.com/watch?v=JCXUYuzwNrM"},{n:"Peso muerto sumo",yt:"https://www.youtube.com/watch?v=WsHCHb_QRpQ"},{n:"Hiperextensiones banco romano",yt:"https://www.youtube.com/watch?v=ph3pddpKzzw"},{n:"Buenos días con barra",yt:"https://www.youtube.com/watch?v=YA-h3n9L4YU"},{n:"Superman en suelo",yt:"https://www.youtube.com/watch?v=z6PJMT2y8GQ"}]},
+"Piernas":{"Cuádriceps":[{n:"Sentadilla libre",yt:"https://www.youtube.com/watch?v=ultWZbUMPL8"},{n:"Sentadilla en Smith",yt:"https://www.youtube.com/watch?v=PL46IpNl8CY"},{n:"Sentadilla hack",yt:"https://www.youtube.com/watch?v=EdtPSAr5o_M"},{n:"Prensa de piernas",yt:"https://www.youtube.com/watch?v=IZxyjW7MPJQ"},{n:"Extensiones de cuádriceps",yt:"https://www.youtube.com/watch?v=YyvSfVjQeL0"},{n:"Sentadilla frontal",yt:"https://www.youtube.com/watch?v=uYumuL_G_V0"},{n:"Zancadas con barra",yt:"https://www.youtube.com/watch?v=D7KaRcUTQeE"},{n:"Zancadas con mancuernas",yt:"https://www.youtube.com/watch?v=L8fvypPrzzs"},{n:"Sentadilla búlgara",yt:"https://www.youtube.com/watch?v=2C-uNgKwPLE"},{n:"Step-up con mancuernas",yt:"https://www.youtube.com/watch?v=5BqADqEpEa0"}],"Isquiotibiales":[{n:"Curl femoral tumbado",yt:"https://www.youtube.com/watch?v=1Tq3QdYUuHs"},{n:"Curl femoral sentado",yt:"https://www.youtube.com/watch?v=ELOCsoDSmrg"},{n:"Curl femoral de pie",yt:"https://www.youtube.com/watch?v=n_Nfx7kEiXo"},{n:"Peso muerto pierna rígida",yt:"https://www.youtube.com/watch?v=JCXUYuzwNrM"},{n:"Curl nórdico",yt:"https://www.youtube.com/watch?v=d2GqxoMOaGU"},{n:"Good mornings",yt:"https://www.youtube.com/watch?v=YA-h3n9L4YU"}],"Glúteos":[{n:"Hip thrust con barra",yt:"https://www.youtube.com/watch?v=SEdqd1n0cvg"},{n:"Hip thrust en máquina",yt:"https://www.youtube.com/watch?v=R3Ogg9VJk4c"},{n:"Puente de glúteos",yt:"https://www.youtube.com/watch?v=OUgsJ8-Vi0E"},{n:"Abducción en máquina",yt:"https://www.youtube.com/watch?v=niiz8bFiKao"},{n:"Patada de glúteo polea",yt:"https://www.youtube.com/watch?v=3DfC6KTMJCY"},{n:"Sentadilla sumo mancuerna",yt:"https://www.youtube.com/watch?v=GnDJJPTqnEw"}],"Gemelos":[{n:"Elevación de talones de pie",yt:"https://www.youtube.com/watch?v=-M4-G8p1fCI"},{n:"Elevación de talones sentado",yt:"https://www.youtube.com/watch?v=JbyjNymZOt0"},{n:"Elevaciones en prensa",yt:"https://www.youtube.com/watch?v=Rv4TCkFH5xk"}]},
+"Hombros":{"Deltoides Anterior":[{n:"Press militar con barra",yt:"https://www.youtube.com/watch?v=2yjwXTZQDDI"},{n:"Press Arnold",yt:"https://www.youtube.com/watch?v=6Z15_WdXmVw"},{n:"Press mancuernas sentado",yt:"https://www.youtube.com/watch?v=qEwKCR5JCog"},{n:"Elevaciones frontales mancuernas",yt:"https://www.youtube.com/watch?v=soxrZlIl35U"},{n:"Elevaciones frontales cable",yt:"https://www.youtube.com/watch?v=BPKnxvJkK7Y"}],"Deltoides Lateral":[{n:"Elevaciones laterales mancuernas",yt:"https://www.youtube.com/watch?v=3VcKaXpzqRo"},{n:"Elevaciones laterales cable",yt:"https://www.youtube.com/watch?v=lPt0GqURKJY"},{n:"Elevaciones laterales máquina",yt:"https://www.youtube.com/watch?v=EA7u4Q_8HQ0"},{n:"Remo al mentón barra",yt:"https://www.youtube.com/watch?v=avn3Lsu1_04"},{n:"Elevaciones laterales inclinado",yt:"https://www.youtube.com/watch?v=DrNVoqhZAWI"}],"Deltoides Posterior":[{n:"Pájaro con mancuernas",yt:"https://www.youtube.com/watch?v=ttvfGg9d76c"},{n:"Pájaro en polea alta",yt:"https://www.youtube.com/watch?v=PKSxhbBQtiI"},{n:"Face pull con cuerda",yt:"https://www.youtube.com/watch?v=rep-qVOkqgk"},{n:"Remo facial cable",yt:"https://www.youtube.com/watch?v=rep-qVOkqgk"},{n:"Pájaro inclinado 45",yt:"https://www.youtube.com/watch?v=ttvfGg9d76c"}]},
+"Bíceps":{"Supinación":[{n:"Curl barra recta",yt:"https://www.youtube.com/watch?v=kwG2ipFRgfo"},{n:"Curl barra Z EZ",yt:"https://www.youtube.com/watch?v=eNt0mhbAGvg"},{n:"Curl mancuernas alterno",yt:"https://www.youtube.com/watch?v=sAq_ocpRh_I"},{n:"Curl mancuernas simultáneo",yt:"https://www.youtube.com/watch?v=ykJmrZ5v0Oo"},{n:"Curl predicador barra",yt:"https://www.youtube.com/watch?v=fIWP-FRFNU0"},{n:"Curl predicador mancuerna",yt:"https://www.youtube.com/watch?v=DVTvoHeHCUs"},{n:"Curl en polea barra recta",yt:"https://www.youtube.com/watch?v=NFzTWp2qpiE"},{n:"Curl araña banco inclinado",yt:"https://www.youtube.com/watch?v=w6GqXYBxE3U"}],"Martillo":[{n:"Curl martillo mancuernas",yt:"https://www.youtube.com/watch?v=TwD-YGVP4Bk"},{n:"Curl martillo cable cuerda",yt:"https://www.youtube.com/watch?v=zC3nLlEvin4"},{n:"Curl cross-body mancuerna",yt:"https://www.youtube.com/watch?v=BVKB8fEYqPo"}],"Concentrado":[{n:"Curl concentrado sentado",yt:"https://www.youtube.com/watch?v=Jvj2wV0vOYU"},{n:"Curl Zottman",yt:"https://www.youtube.com/watch?v=ZrFZFGqaUqc"},{n:"Curl inclinado mancuernas",yt:"https://www.youtube.com/watch?v=hKkqtGNj25g"}]},
+"Tríceps":{"Extensiones en polea":[{n:"Extensión polea con cuerda",yt:"https://www.youtube.com/watch?v=2-LAMcpzODU"},{n:"Extensión polea barra recta",yt:"https://www.youtube.com/watch?v=y8VJNqKvmY8"},{n:"Extensión polea barra V",yt:"https://www.youtube.com/watch?v=nHFdpKF0jmc"},{n:"Extensión unilateral cable",yt:"https://www.youtube.com/watch?v=NCKFqKerPL0"},{n:"Extensión sobre cabeza polea",yt:"https://www.youtube.com/watch?v=7dHm7PG1sUA"}],"Extensiones libres":[{n:"Extensión francesa barra EZ",yt:"https://www.youtube.com/watch?v=d_KZxkY_0cM"},{n:"Extensión francesa mancuerna",yt:"https://www.youtube.com/watch?v=2rFwBQ_jZo0"},{n:"Skull crushers barra",yt:"https://www.youtube.com/watch?v=d_KZxkY_0cM"},{n:"Skull crushers mancuernas",yt:"https://www.youtube.com/watch?v=l3WDbQhBxNE"}],"Press y fondos":[{n:"Fondos en paralelas tríceps",yt:"https://www.youtube.com/watch?v=wjUmnZH528Y"},{n:"Fondos en banco",yt:"https://www.youtube.com/watch?v=0326dy_-CzM"},{n:"Press cerrado con barra",yt:"https://www.youtube.com/watch?v=nEF0bv2Fi54"},{n:"Kickback mancuerna",yt:"https://www.youtube.com/watch?v=6SS6K3lAwZ8"}]},
+"Core":{"Abdomen Superior":[{n:"Crunch en suelo",yt:"https://www.youtube.com/watch?v=MKxCNJGBFCA"},{n:"Crunch en máquina",yt:"https://www.youtube.com/watch?v=eLJHOBCGhCk"},{n:"Crunch con cable",yt:"https://www.youtube.com/watch?v=AV5PmPRFNKQ"},{n:"Sit-ups completos",yt:"https://www.youtube.com/watch?v=1fbU_MkV7NE"},{n:"Crunch declinado",yt:"https://www.youtube.com/watch?v=SG_e4U2DUa8"}],"Abdomen Inferior":[{n:"Elevación de piernas colgado",yt:"https://www.youtube.com/watch?v=hdng3Nm1x_E"},{n:"Elevación de rodillas colgado",yt:"https://www.youtube.com/watch?v=hdng3Nm1x_E"},{n:"Tijeras en suelo",yt:"https://www.youtube.com/watch?v=I9lGNDdmmI8"},{n:"Flutter kicks",yt:"https://www.youtube.com/watch?v=ANVdMDaYRts"},{n:"Dragon flag",yt:"https://www.youtube.com/watch?v=moyFIvRrS0s"}],"Oblicuos":[{n:"Giro ruso con peso",yt:"https://www.youtube.com/watch?v=wkD8rjkodUI"},{n:"Pallof press cable",yt:"https://www.youtube.com/watch?v=AH_QZLm_0-s"},{n:"Plancha lateral",yt:"https://www.youtube.com/watch?v=wqzrb67Dwf8"},{n:"Woodchopper polea",yt:"https://www.youtube.com/watch?v=YGNI_oDYI6g"}]},
+"Antebrazos":{"Flexores y extensores":[{n:"Curl de muñeca barra",yt:"https://www.youtube.com/watch?v=8JEjQ5dJzj0"},{n:"Curl inverso con barra",yt:"https://www.youtube.com/watch?v=lB2BOvMTCfE"},{n:"Extensión de muñeca barra",yt:"https://www.youtube.com/watch?v=7KBPIBaFBCE"},{n:"Farmers carry",yt:"https://www.youtube.com/watch?v=Fkzk_RqlYig"},{n:"Dead hang en barra",yt:"https://www.youtube.com/watch?v=lKKLiY47WvU"}]}
+};
+
+const EX_INFO={
+"Press banca con barra":{p:["Pectoral mayor"],s:["Deltoides ant.","Tríceps"],steps:["Túmbate en banco, pies planos en el suelo","Agarre ligeramente más ancho que hombros","Baja la barra hasta el pecho en 2–3 s","Empuja explosivamente sin bloquear los codos","Omóplatos retraídos durante todo el movimiento"],tips:"No arquees excesivamente la lumbar. Antebrazos perpendiculares al suelo en el punto más bajo."},
+"Sentadilla libre":{p:["Cuádriceps","Glúteos"],s:["Isquiotibiales","Core","Aductores"],steps:["Barra sobre trapecios, pies a la anchura de caderas","Inicia con las caderas hacia atrás","Baja hasta muslos paralelos al suelo","Rodillas en dirección de los pies","Empuja desde los talones para subir"],tips:"Torso erguido, core braced. Las rodillas no deben colapsar hacia dentro."},
+"Peso muerto convencional":{p:["Isquiotibiales","Glúteos","Lumbar"],s:["Cuádriceps","Trapecio","Core"],steps:["Pies a anchura de caderas, barra sobre el medio del pie","Agarre justo fuera de las rodillas","Caderas abajo, pecho arriba, espalda neutra","Empuja el suelo mientras la barra sube por las tibias","Al pasar rodillas extiende caderas"],tips:"La barra debe mantenerse pegada al cuerpo. Nunca con espalda redonda."},
+"Dominadas agarre prono":{p:["Dorsal ancho"],s:["Bíceps","Romboides","Teres mayor"],steps:["Agarre pronado más ancho que hombros","Activa el dorsal antes de tirar","Lleva los codos hacia abajo y atrás","Sube hasta que la barbilla supere la barra","Baja de forma controlada"],tips:"Sin balanceos. Visualiza que rompes la barra por la mitad para activar el dorsal."},
+"Curl barra recta":{p:["Bíceps braquial"],s:["Braquial","Braquiorradial"],steps:["De pie, agarre supino a anchura de hombros","Codos pegados al torso todo el movimiento","Flexiona llevando la barra hacia los hombros","Supina completamente la muñeca al subir","Baja en 2–3 segundos"],tips:"Sin impulso de espalda. Rango completo maximiza la activación. Pausa 1 s arriba."},
+"Hip thrust con barra":{p:["Glúteo mayor"],s:["Isquiotibiales","Core"],steps:["Espalda en banco a altura de omóplatos","Barra sobre caderas con almohadilla","Pies a anchura de caderas, rodillas a 90° arriba","Empuja con talones y eleva caderas","Aprieta glúteos en posición alta 1–2 s"],tips:"Pico de contracción máximo arriba. Evita hiperextender la lumbar."},
+"Press militar con barra":{p:["Deltoides anterior"],s:["Deltoides lat.","Tríceps","Trapecio"],steps:["De pie o sentado, barra a altura del pecho","Empuja verticalmente sobre la cabeza","Mete la cabeza al pasar la frente","Al bajar, codos ligeramente adelante","Core y glúteo activados"],tips:"No hiperextiendas la lumbar. Activa glúteo y abdomen durante el movimiento."},
+"Elevaciones laterales mancuernas":{p:["Deltoides lateral"],s:["Deltoides ant.","Trapecio sup."],steps:["De pie, mancuernas a los lados","Eleva los brazos lateralmente hasta altura del hombro","Codo ligeramente más alto que la muñeca","Baja en 3–4 segundos","Sin impulso de cintura"],tips:"Girar las muñecas hacia abajo activa más el deltoides lateral. Sube a 90° máximo."},
+"Remo con barra":{p:["Dorsal ancho","Romboides"],s:["Bíceps","Trapecio medio"],steps:["Inclinado a 45°, agarre prono","Retrae omóplatos antes de tirar","Lleva barra hacia el ombligo, codos cerca del torso","Aprieta la espalda 1 s arriba","Baja de forma controlada"],tips:"No hagas hump con la espalda al subir. El movimiento es de codos hacia atrás."},
+"Face pull con cuerda":{p:["Deltoides posterior"],s:["Romboides","Trapecio medio","Manguito"],steps:["Polea alta, cuerda a altura de frente","Agarre neutro con pulgares hacia arriba","Tira hacia la cara, codos arriba y atrás","Lleva las manos a los lados de la cabeza","Pausa 1 s y regresa de forma controlada"],tips:"Uno de los mejores ejercicios para la salud del hombro. Prioriza la técnica sobre el peso."}
+};
+
+const PAGES={dashboard:"Inicio",encyclopedia:"Ejercicios",log:"Registrar sesión",history:"Historial",analysis:"Análisis IA"};
+let logs=JSON.parse(localStorage.getItem('ft_logs')||'[]');
+let activeMuscle=Object.keys(DB)[0];
+let activeFilter='all';
+let allEx=[];
+let curYt='',curName='',curMuscle='';
+
+function saveLogs(){localStorage.setItem('ft_logs',JSON.stringify(logs));}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.nav-tab-center').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const ni=document.getElementById('nav-'+id);if(ni)ni.classList.add('active');
+  document.getElementById('page-title').textContent=PAGES[id]||id;
+  if(id==='encyclopedia')buildEnc();
+  if(id==='history')renderHistory();
+  if(id==='dashboard')updateKPIs();
+  if(id==='analysis')renderAnalysis();
+  document.querySelector('.content-area').scrollTop=0;
+}
+
+function buildEnc(){
+  const scroll=document.getElementById('muscle-scroll');
+  scroll.innerHTML=Object.keys(DB).map(m=>`<button class="muscle-pill${m===activeMuscle?' active':''}" onclick="selectMuscle('${m}')">${m}</button>`).join('');
+  renderEnc();
+}
+function selectMuscle(m){activeMuscle=m;buildEnc();}
+function renderEnc(){
+  allEx=[];
+  const q=(document.getElementById('enc-input')||{value:''}).value.toLowerCase();
+  const body=document.getElementById('enc-body');
+  const groups=DB[activeMuscle];
+  let html='';
+  for(const[sub,exs] of Object.entries(groups)){
+    const filtered=exs.filter(e=>e.n.toLowerCase().includes(q));
+    if(!filtered.length)continue;
+    html+=`<div class="subgroup-block"><div class="subgroup-label">${sub}</div><div>`;
+    filtered.forEach(e=>{
+      const idx=allEx.length;
+      allEx.push({n:e.n,m:activeMuscle,yt:e.yt});
+      html+=`<button class="ex-chip" onclick="openModal(${idx})"><i class="ti ti-brand-youtube"></i>${e.n}</button>`;
+    });
+    html+=`</div></div>`;
+  }
+  if(!html)html=`<div class="empty"><div class="empty-icon"><i class="ti ti-search"></i></div><div class="empty-title">Sin resultados</div></div>`;
+  body.innerHTML=html;
+}
+
+function getYtId(url){const m=url.match(/[?&]v=([^&]+)/);return m?m[1]:'';}
+
+function openModal(idx){
+  const ex=allEx[idx];if(!ex)return;
+  curYt=ex.yt;curName=ex.n;curMuscle=ex.m;
+  document.getElementById('modal-name').textContent=ex.n;
+  document.getElementById('modal-tag').textContent=ex.m;
+  document.getElementById('yt-lbl').textContent=ex.n;
+  const thumb=document.getElementById('yt-thumb');
+  const old=thumb.querySelector('img');if(old)old.remove();
+  const ytId=getYtId(ex.yt);
+  if(ytId){
+    const img=new Image();img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';img.alt=ex.n;
+    img.src=`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    img.onerror=()=>{img.remove();};
+    thumb.insertBefore(img,thumb.firstChild);
+  }
+  const info=EX_INFO[ex.n];
+  document.getElementById('modal-primary').innerHTML=(info?info.p:[ex.m]).map(m=>`<span class="badge-primary">${m}</span>`).join('');
+  document.getElementById('modal-secondary').innerHTML=info&&info.s&&info.s.length?info.s.map(m=>`<span class="badge-secondary">${m}</span>`).join(''):`<span style="font-size:12px;color:var(--text3)">—</span>`;
+  const steps=info?info.steps:['Consulta un entrenador para la técnica correcta de este ejercicio.'];
+  document.getElementById('modal-steps').innerHTML=steps.map((s,i)=>`<div class="step-item"><div class="step-num">${i+1}</div><div>${s}</div></div>`).join('');
+  document.getElementById('modal-tips').textContent=info?info.tips:'Mantén siempre la forma correcta y progresa gradualmente.';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openYT(){if(curYt)window.open(curYt,'_blank');}
+function closeModalBg(e){if(e.target.id==='modal-overlay')closeModal();}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function useExercise(){
+  document.getElementById('log-exercise').value=curName;
+  document.getElementById('log-muscle').value=curMuscle;
+  closeModal();goTo('log');showToast('Ejercicio: '+curName);
+}
+
+function addSet(){
+  const body=document.getElementById('sets-body');
+  const n=body.children.length+1;
+  const row=document.createElement('div');row.className='set-row';
+  row.innerHTML=`<div><div class="set-badge">${n}</div></div><div><input class="set-input" type="number" inputmode="decimal" placeholder="10" min="1" max="200"></div><div><input class="set-input" type="number" inputmode="decimal" placeholder="60" min="0" step="0.5"></div><div><input class="set-input" type="number" inputmode="decimal" placeholder="7" min="1" max="10"></div><div><button class="btn-del-sm" onclick="this.closest('.set-row').remove();renum()"><i class="ti ti-trash"></i></button></div>`;
+  body.appendChild(row);
+}
+function renum(){document.querySelectorAll('.set-badge').forEach((b,i)=>b.textContent=i+1);}
+function clearForm(){
+  document.getElementById('log-exercise').value='';
+  document.getElementById('log-notes').value='';
+  document.getElementById('log-muscle').value='';
+  document.getElementById('sets-body').innerHTML='';
+  document.getElementById('log-date').value=today();
+  addSet();addSet();addSet();
+}
+function today(){return new Date().toISOString().split('T')[0];}
+function saveLog(){
+  const ex=document.getElementById('log-exercise').value.trim();
+  const date=document.getElementById('log-date').value;
+  const muscle=document.getElementById('log-muscle').value;
+  const unit=document.getElementById('log-unit').value;
+  const notes=document.getElementById('log-notes').value;
+  if(!ex||!date){showToast('Completa ejercicio y fecha',true);return;}
+  const rows=document.querySelectorAll('#sets-body .set-row');
+  if(!rows.length){showToast('Añade al menos una serie',true);return;}
+  const sets=[];
+  rows.forEach(r=>{const inp=r.querySelectorAll('input');sets.push({reps:inp[0].value||'—',weight:inp[1].value||'0',rpe:inp[2].value||'—',rir:'—'});});
+  logs.unshift({id:Date.now(),date,exercise:ex,muscle,unit,notes,sets});
+  saveLogs();showToast('Sesión guardada');updateKPIs();clearForm();goTo('history');
+}
+
+function updateKPIs(){
+  const s=logs.length;
+  const exs=new Set(logs.map(l=>l.exercise.toLowerCase())).size;
+  let vol=0;logs.forEach(l=>l.sets.forEach(s=>vol+=(parseFloat(s.weight)||0)*(parseInt(s.reps)||0)));
+  const prs=calcPRs();
+  document.getElementById('kpi-s').textContent=s;
+  document.getElementById('kpi-e').textContent=exs;
+  document.getElementById('kpi-v').textContent=Math.round(vol).toLocaleString('es-ES');
+  document.getElementById('kpi-p').textContent=prs;
+  if(s>0){
+    document.getElementById('kpi-sd').className='kpi-delta up';document.getElementById('kpi-sd').textContent='↑ registradas';
+    document.getElementById('kpi-ed').className='kpi-delta up';document.getElementById('kpi-ed').textContent='↑ distintos';
+    document.getElementById('kpi-vd').className='kpi-delta up';document.getElementById('kpi-vd').textContent='↑ acumulado';
+    document.getElementById('kpi-pd').className='kpi-delta up';document.getElementById('kpi-pd').textContent='↑ mejoras';
+  }
+  const rl=document.getElementById('recent-list');
+  if(!logs.length){rl.innerHTML=`<div class="empty" style="padding:24px 10px"><div class="empty-icon"><i class="ti ti-history"></i></div><div class="empty-title">Sin sesiones</div><div class="empty-desc">Pulsa + para registrar</div></div>`;return;}
+  rl.innerHTML=logs.slice(0,5).map(l=>{const vol=l.sets.reduce((a,s)=>a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0);return `<div class="recent-item" onclick="goTo('history')"><div class="recent-dot"></div><div class="recent-name">${l.exercise}</div><div class="recent-meta">${l.date} · ${Math.round(vol)} ${l.unit}</div></div>`;}).join('');
+}
+function calcPRs(){
+  const mx={};let p=0;
+  [...logs].reverse().forEach(l=>{const k=l.exercise.toLowerCase();const w=Math.max(...l.sets.map(s=>parseFloat(s.weight)||0));if(mx[k]!==undefined&&w>mx[k])p++;mx[k]=Math.max(mx[k]||0,w);});
+  return p;
+}
+
+function renderHistory(){
+  const muscles=['Todos',...new Set(logs.map(l=>l.muscle).filter(Boolean))];
+  document.getElementById('hist-filters').innerHTML=muscles.map(m=>`<button class="hist-pill${(m==='Todos'&&activeFilter==='all')||(m===activeFilter)?' active':''}" onclick="setFilter('${m==='Todos'?'all':m}')">${m}</button>`).join('');
+  const filtered=activeFilter==='all'?logs:logs.filter(l=>l.muscle===activeFilter);
+  const body=document.getElementById('hist-body');
+  if(!filtered.length){body.innerHTML=`<div class="empty"><div class="empty-icon"><i class="ti ti-chart-line"></i></div><div class="empty-title">Sin sesiones</div><div class="empty-desc">Pulsa + para registrar tu primer entrenamiento</div></div>`;return;}
+  body.innerHTML=filtered.map(entry=>{const prev=logs.slice(logs.indexOf(entry)+1).find(l=>l.exercise.toLowerCase()===entry.exercise.toLowerCase());return buildLogCard(entry,prev);}).join('');
+}
+function setFilter(f){activeFilter=f;renderHistory();}
+function rpeDots(v){const n=parseInt(v)||0;return `<div class="rpe-dots">${Array(10).fill(0).map((_,i)=>`<div class="rpe-dot${i<n?' on':''}"></div>`).join('')}</div>`;}
+function buildLogCard(entry,prev){
+  const vol=entry.sets.reduce((a,s)=>a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0);
+  let prog='';
+  if(prev){
+    const pv=prev.sets.reduce((a,s)=>a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0);
+    const diff=vol-pv;const pct=pv?Math.abs((diff/pv)*100).toFixed(1):0;
+    if(diff>0)prog=`<div class="prog-strip up"><i class="ti ti-trending-up"></i><div><div class="prog-title">Progresión +${pct}%</div><div class="prog-body">Ant: <strong>${Math.round(pv)} ${entry.unit}</strong> → Actual: <strong>${Math.round(vol)} ${entry.unit}</strong><br>Objetivo: +2,5 kg o +1 rep</div></div></div>`;
+    else if(diff<0)prog=`<div class="prog-strip warn"><i class="ti ti-trending-down"></i><div><div class="prog-title">Volumen inferior −${pct}%</div><div class="prog-body">Mantén el peso y completa todas las reps</div></div></div>`;
+    else prog=`<div class="prog-strip same"><i class="ti ti-minus"></i><div><div class="prog-title">Sin cambio</div><div class="prog-body">Intenta +2,5 kg o +1 rep en la próxima sesión</div></div></div>`;
+  }
+  const setsHtml=entry.sets.map((s,i)=>`<tr><td><div class="set-badge" style="display:inline-flex">${i+1}</div></td><td><strong>${s.reps}</strong></td><td><strong>${s.weight}</strong> <span style="color:var(--text3);font-size:11px">${entry.unit}</span></td><td>${rpeDots(s.rpe)}</td></tr>`).join('');
+  return `<div class="log-card"><div class="log-card-top"><div class="log-ex-name">${entry.exercise}</div><div class="log-pills">${entry.muscle?`<span class="pill pill-muscle">${entry.muscle}</span>`:''}<span class="pill pill-vol">${Math.round(vol)} ${entry.unit}</span><span class="pill pill-vol">${entry.sets.length} series</span></div><div class="log-date-row"><div class="log-date">${entry.date}</div><button class="btn-del-sm" onclick="deleteLog(${entry.id})"><i class="ti ti-trash"></i></button></div></div><table class="log-sets-table"><thead><tr><th>#</th><th>Reps</th><th>Peso</th><th>RPE</th></tr></thead><tbody>${setsHtml}</tbody></table>${entry.notes?`<div class="log-notes"><i class="ti ti-notes"></i>${entry.notes}</div>`:''}${prog}</div>`;
+}
+function deleteLog(id){logs=logs.filter(l=>l.id!==id);saveLogs();renderHistory();updateKPIs();showToast('Sesión eliminada');}
+
+function renderAnalysis(){
+  const body=document.getElementById('analysis-body');
+  const exMap={};
+  logs.forEach(l=>{const k=l.exercise.toLowerCase();if(!exMap[k])exMap[k]={name:l.exercise,sessions:[]};exMap[k].sessions.push(l);});
+  const multi=Object.values(exMap).filter(e=>e.sessions.length>=2);
+  if(!multi.length){body.innerHTML=`<div class="empty"><div class="empty-icon"><i class="ti ti-brain"></i></div><div class="empty-title">Sin datos suficientes</div><div class="empty-desc">Registra al menos dos sesiones del mismo ejercicio para activar el análisis</div></div>`;return;}
+  body.innerHTML=multi.map(ex=>{
+    const sorted=[...ex.sessions].sort((a,b)=>a.date.localeCompare(b.date));
+    const last=sorted[sorted.length-1];const prev=sorted[sorted.length-2];
+    const lv=last.sets.reduce((a,s)=>a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0);
+    const pv=prev.sets.reduce((a,s)=>a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0);
+    const diff=lv-pv;const pct=pv?((diff/pv)*100).toFixed(1):0;
+    const maxW=Math.max(...last.sets.map(s=>parseFloat(s.weight)||0));
+    const nextW=(maxW+2.5).toFixed(1);
+    const barPct=Math.min(100,Math.max(0,50+(parseFloat(pct)||0)*2));
+    const color=diff>0?'var(--green)':diff<0?'var(--red)':'var(--amber)';
+    return `<div class="analysis-item"><div class="analysis-ex">${ex.name}</div><div class="analysis-meta">${ex.sessions.length} sesiones · Último peso: ${maxW} ${last.unit}</div><div class="analysis-bar-wrap"><div class="analysis-bar" style="width:${barPct}%"></div></div><div class="analysis-rec">${diff>0?`Progresando correctamente (+${pct}%). Objetivo: <strong>${nextW} ${last.unit}</strong> o +1 rep por serie.`:diff<0?`Regresión detectada (${pct}%). Vuelve al peso anterior y consolida antes de subir.`:`Estancamiento. Intenta <strong>${nextW} ${last.unit}</strong> o añade 1 rep.`}</div></div>`;
+  }).join('');
+}
+
+function showToast(msg,err=false){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-icon').className=err?'ti ti-alert-circle':'ti ti-check';
+  document.getElementById('toast-icon').style.color=err?'#ff6b6b':'var(--gold)';
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+document.getElementById('log-date').value=today();
+addSet();addSet();addSet();
+buildEnc();updateKPIs();
+</script>
+</body>
+</html>
